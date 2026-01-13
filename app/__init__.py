@@ -1,13 +1,23 @@
 from flask import Flask
+from pathlib import Path
 
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "dev"
 
-    # importera blueprint
-    from app.blueprints.public.routes import public_bp
+    # --- DATABASE CONFIG ---
+    # database.db hamnar i projektroten
+    app.config["DATABASE"] = str(
+        Path(app.root_path).parent / "database.db"
+    )
 
-    # registrera blueprint
+    # koppla in db-hjälpfunktioner
+    from app import db
+    db.init_app(app)
+
+    # --- BLUEPRINTS ---
+    from app.blueprints.public.routes import public_bp
     app.register_blueprint(public_bp)
 
     return app
+
