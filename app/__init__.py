@@ -16,8 +16,9 @@ def create_app():
     db.init_app(app)
 
     # --- BLUEPRINTS ---
-    from app.blueprints.public.routes import public_bp
-    app.register_blueprint(public_bp)
+
+    from app.blueprints.bids.routes import bid_bp
+    app.register_blueprint(bid_bp, url_prefix='/bids')
 
     return app
 
