@@ -1,7 +1,12 @@
+# macOS
+.DS_Store
+
+# Python & Virtual Environment
 __pycache__/
 *.pyc
-*.db
-.env
-.venv/
 venv/
 instance/
+
+# Local configuration & data
+database.db
+.env
