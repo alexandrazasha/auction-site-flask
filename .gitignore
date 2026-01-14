@@ -7,6 +7,10 @@ __pycache__/
 venv/
 instance/
 
-# Local configuration & data
+# Local data & config
 database.db
 .env
+
+# Editor/IDE specific
+.vscode/
+.idea/
