@@ -1,7 +1,13 @@
-__pycache__/
-*.pyc
-*.db
-.env
-.venv/
+# macOS system files
+.DS_Store
+
+# Python virtual environment
 venv/
-instance/
+__pycache__/
+
+# SQLite database file
+database.db
+
+# Editor/IDE specific
+.vscode/
+.idea/
