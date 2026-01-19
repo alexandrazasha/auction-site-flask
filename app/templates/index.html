@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <title>Auktioner</title>
+</head>
+<body>
+
+  <h1>Pågående & kommande auktioner</h1>
+
+  <ul>
+    {% for item in auctions %}
+      <li>
+        <strong>{{ item.auction["title"] }}</strong><br>
+        {{ item.auction["description"] }}<br>
+        Slutar: {{ item.auction["end_datetime"] }}<br>
+        👍 {{ item.likes }} / 👎 {{ item.dislikes }}<br>
+
+        <a href="/auction/{{ item.auction['id'] }}">
+          Visa auktion
+        </a>
+      </li>
+      <hr>
+    {% endfor %}
+  </ul>
+
+</body>
+</html>

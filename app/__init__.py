@@ -17,7 +17,13 @@ def create_app():
 
     # --- BLUEPRINTS ---
     from app.blueprints.public.routes import public_bp
+    from app.blueprints.auction.routes import auction_bp
+
     app.register_blueprint(public_bp)
+    app.register_blueprint(auction_bp)
+
+
+
 
     return app
 
