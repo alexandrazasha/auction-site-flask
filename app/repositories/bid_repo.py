@@ -28,3 +28,31 @@ class BidRepository:
             "SELECT * FROM bids WHERE auction_id = ? ORDER BY amount DESC LIMIT ?",
             (auction_id, limit)
         ).fetchall()
+    
+    @staticmethod
+    def search_auctions(keyword=None, category=None, max_price=None):
+       
+        """Hämtar auktioner baserat på sökord, kategori och prisintervall."""
+        db = get_db()
+        
+        # Startar SQL-frågan som hämtar alla rader från auktionstabellen
+        query = "SELECT * FROM auctions WHERE 1=1"
+        params = []
+
+        # Lägger till filter för sökord i titeln om ett ord har skickats med
+        if keyword:
+            query += " AND title LIKE ?"
+            params.append(f"%{keyword}%")
+
+        # Lägger till filter för kategori om en sådan är vald
+        if category:
+            query += " AND category = ?"
+            params.append(category)
+
+        # Lägger till filter för högsta pris för att begränsa sökresultaten
+        if max_price:
+            query += " AND current_bid <= ?"
+            params.append(max_price)
+
+        # Utför sökningen i databasen och returnerar alla matchande rader
+        return db.execute(query, params).fetchall()

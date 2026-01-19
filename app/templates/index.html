@@ -1,0 +1,24 @@
+<div class="filter-container">
+    <form action="{{ url_for('bid_bp.search') }}" method="GET" class="filter-form">
+        <div class="filter-group">
+            <label>Sök</label>
+            <input type="text" name="keyword" placeholder="Vad letar du efter?">
+        </div>
+        
+        <div class="filter-group">
+            <label>Kategori</label>
+            <select name="category">
+                <option value="">Alla kategorier</option>
+                <option value="Konst">Konst</option>
+                <option value="Elektronik">Elektronik</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Maxpris</label>
+            <input type="number" name="max_price" placeholder="t.ex. 500">
+        </div>
+
+        <button type="submit" class="search-btn">Filtrera auktioner</button>
+    </form>
+</div>

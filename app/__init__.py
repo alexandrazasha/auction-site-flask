@@ -6,18 +6,17 @@ def create_app():
     app.config["SECRET_KEY"] = "dev"
 
     # --- DATABASE CONFIG ---
-    # database.db hamnar i projektroten
     app.config["DATABASE"] = str(
         Path(app.root_path).parent / "database.db"
     )
 
-    # koppla in db-hjälpfunktioner
     from app import db
     db.init_app(app)
 
     # --- BLUEPRINTS ---
-
-    from app.blueprints.bids.routes import bid_bp
+    # Vi ändrar importen så den pekar på din fil bid_bp.py i mappen bids
+    from app.blueprints.bids.bid_bp import bid_bp
+    # Vi registrerar den. Nu nås dina funktioner via /bids/
     app.register_blueprint(bid_bp, url_prefix='/bids')
 
     return app
