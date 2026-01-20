@@ -19,12 +19,22 @@ def search():
     # Hämtar angivet maxpris för filtrering av sökresultat [cite: 52]
     max_pris = request.args.get('max_price')
 
-    # Anropar metoden direkt på klassnamnet eftersom den är en staticmethod [cite: 57, 64]
-    # Här skickar vi med sökord, kategori och maxpris som parametrar [cite: 61, 64]
     resultat = BidRepository.search_auctions(keyword=sokord, category=kategori, max_price=max_pris)
 
-    # Returnerar HTML-mallen med listan på de auktioner som matchar filtren [cite: 35]
-    return render_template('index.html', auctions=resultat)
+    # Bygg samma struktur som index.html förväntar sig (auction + likes/dislikes)
+    from app.repositories.vote_repo import VoteRepository
+    vote_repo = VoteRepository()
+
+    auctions_with_votes = []
+    for a in resultat:
+        auctions_with_votes.append({
+            "auction": a,
+            "likes": vote_repo.count_likes(a["id"]),
+            "dislikes": vote_repo.count_dislikes(a["id"]),
+        })
+
+    return render_template("index.html", auctions=auctions_with_votes)
+
 
 # --- RUTT 2: VISAR DE TVÅ SENASTE BUDEN ---
 @bid_bp.route('/auction/<int:auction_id>')
@@ -36,31 +46,29 @@ def auction_detail(auction_id):
     return render_template('detail.html', bids=topp_bud, auction_id=auction_id)
 
 
-# --- RUTT 3: KAN LÄGGA BUD och kollar så det är högre än senaste bud --- 
-@bid_bp.route('/place_bid/<int:auction_id>', methods=['POST'])
-def place_bid():
-    # 1. Hämta data från formuläret
-    auction_id = request.form.get('auction_id')
-    bidder_email = request.form.get('bidder_email')
+# --- RUTT 3: LÄGGER BUD och kollar så det är högre än senaste bud ---
+@bid_bp.post("/place/<int:auction_id>")
+def place_bid(auction_id: int):
+    bidder_email = request.form.get("bidder_email")
+
     try:
-        amount = float(request.form.get('amount'))
+        amount = int(request.form.get("amount"))
     except (ValueError, TypeError):
         flash("Ogiltigt belopp!")
-        return redirect(url_for('bid_bp.auction_detail', auction_id=auction_id))
+        return redirect(url_for("auction_bp.auction_detail", auction_id=auction_id))
 
-    # 2. Hämta det nuvarande högsta budet för att validera
+    # Hämta nuvarande högsta bud för validering
     current_top_bids = BidRepository.get_top_bids(auction_id, limit=1)
-    
-    # 3. Validera så det är ett högre bud
+
     if current_top_bids:
-        highest_bid = current_top_bids[0]['amount']
+        highest_bid = current_top_bids[0]["amount"]
         if amount <= highest_bid:
             flash(f"Ditt bud måste vara högre än nuvarande bud ({highest_bid} kr)!")
-            return redirect(url_for('bid_bp.auction_detail', auction_id=auction_id))
+            return redirect(url_for("auction_bp.auction_detail", auction_id=auction_id))
 
-    # 4. Om ok -> Spara i databasen
+    # Spara bud
     BidRepository.create_bid(auction_id, bidder_email, amount)
     flash("Ditt bud har registrerats!")
-    
-    # Skicka användaren tillbaka till auktionssidan så de ser sitt bud i historiken
-    return redirect(url_for('bid_bp.auction_detail', auction_id=auction_id))
+
+    # Tillbaka till din auktion-detaljsida
+    return redirect(url_for("auction_bp.auction_detail", auction_id=auction_id))
