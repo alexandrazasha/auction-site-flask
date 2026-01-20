@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+
 # Importera din BidRepository från rätt ställe 
 from app.repositories.bid_repo import BidRepository
+
 
 # Skapar en blueprint för att gruppera budgivnings- och sökfunktionalitet [cite: 56]
 bid_bp = Blueprint('bid_bp', __name__)
@@ -33,14 +35,13 @@ def auction_detail(auction_id):
     # Vi skickar med 'bids' till detail.html
     return render_template('detail.html', bids=topp_bud, auction_id=auction_id)
 
-from flask import flash, redirect, url_for # Se till att dessa är importerade längst upp
 
 # --- RUTT 3: KAN LÄGGA BUD och kollar så det är högre än senaste bud --- 
-@bid_bp.route('/place_bid', methods=['POST'])
+@bid_bp.route('/place_bid/<int:auction_id>', methods=['POST'])
 def place_bid():
     # 1. Hämta data från formuläret
     auction_id = request.form.get('auction_id')
-    bidder_email = request.form.get('email')
+    bidder_email = request.form.get('bidder_email')
     try:
         amount = float(request.form.get('amount'))
     except (ValueError, TypeError):

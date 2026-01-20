@@ -7,7 +7,7 @@ bid_bp = Blueprint('bid_bp', __name__)
 @bid_bp.route('/place/<int:auction_id>', methods=['POST'])
 def place_bid(auction_id):
     # 1. Hämta data från formuläret
-    email = request.form.get('email')
+    email = request.form.get('bidder_email')
     amount = float(request.form.get('amount'))
 
     # 2. Logik: Är budet högre än det nuvarande?
@@ -21,5 +21,5 @@ def place_bid(auction_id):
         flash("Budet är lagt!", "success")
 
     # 4. Skicka tillbaka användaren till auktionssidan
-    return redirect(url_for('public_bp.auction_detail', auction_id=auction_id))
+    return redirect(url_for('auction_bp.auction_detail', auction_id=auction_id))
 
