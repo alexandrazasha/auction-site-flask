@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <title>{{ auction["title"] }}</title>
+</head>
+<body>
+
+  <a href="/auctions">← Tillbaka</a>
+
+  <h1>{{ auction["title"] }}</h1>
+  <p>{{ auction["description"] }}</p>
+
+  <p>👍 {{ likes }} &nbsp;&nbsp; 👎 {{ dislikes }}</p>
+
+  <form method="post" action="/auction/{{ auction['id'] }}/like" style="display:inline;">
+    <button type="submit">👍 Like</button>
+  </form>
+
+  <form method="post" action="/auction/{{ auction['id'] }}/dislike" style="display:inline;">
+    <button type="submit">👎 Dislike</button>
+  </form>
+
+  <p><strong>Startbud:</strong> {{ auction["starting_bid"] }}</p>
+  <p><strong>Slutar:</strong> {{ auction["end_datetime"] }}</p>
+
+  <h2>Två högsta bud</h2>
+
+  {% if top_bids %}
+    <ol>
+      {% for bid in top_bids %}
+        <li>
+          <strong>{{ bid["amount"] }}</strong> kr
+          – {{ bid["bidder_email"] }}
+          – {{ bid["created_at"] }}
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>Inga bud ännu.</p>
+  {% endif %}
+
+<h2>Lägg bud</h2>
+
+<form method="post" action="/bids/place/{{ auction['id'] }}">
+  <label for="amount">Belopp:</label>
+  <input type="number" id="amount" name="amount" min="1" required>
+
+  <label for="bidder_email">E-post:</label>
+  <input type="email" id="bidder_email" name="bidder_email" required>
+
+  <button type="submit">Lägg bud</button>
+</form>
+
+
+</body>
+</html>

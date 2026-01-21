@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <title>Auktioner</title>
+</head>
+<body>
+
+  <h1>Pågående & kommande auktioner</h1>
+
+  <!-- Filter / sök -->
+  <div class="filter-container">
+    <form action="{{ url_for('bid_bp.search') }}" method="GET" class="filter-form">
+      <div class="filter-group">
+        <label>Sök</label>
+        <input type="text" name="keyword" placeholder="Vad letar du efter?">
+      </div>
+
+      <div class="filter-group">
+        <label>Kategori</label>
+        <select name="category">
+          <option value="">Alla kategorier</option>
+          <option value="Konst">Konst</option>
+          <option value="Elektronik">Elektronik</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Maxpris</label>
+        <input type="number" name="max_price" placeholder="t.ex. 500">
+      </div>
+
+      <button type="submit" class="search-btn">Filtrera auktioner</button>
+    </form>
+  </div>
+
+  <ul>
+    {% for item in auctions %}
+      <li>
+        <strong>{{ item.auction["title"] }}</strong><br>
+        {{ item.auction["description"] }}<br>
+        Slutar: {{ item.auction["end_datetime"] }}<br>
+        👍 {{ item.likes }} / 👎 {{ item.dislikes }}<br>
+
+        <a href="/auction/{{ item.auction['id'] }}">
+          Visa auktion
+        </a>
+      </li>
+      <hr>
+    {% endfor %}
+  </ul>
+
+</body>
+</html>
+
