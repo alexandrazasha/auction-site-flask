@@ -28,4 +28,19 @@ class AuctionRepository(BaseRepo):
         """
         return self.query_all(sql, (auction_id,))
 
+    def create(self, title, description, category, starting_bid, end_datetime):
+        """Skapar en ny auktion och sparar den i databasen."""
+        sql = """
+            INSERT INTO auctions (title, description, category, starting_bid, end_datetime)
+            VALUES (?, ?, ?, ?, ?)
+        """
+        return self.execute(sql, (title, description, category, starting_bid, end_datetime))
 
+    def update(self, auction_id, title, description, category, starting_bid, end_datetime):
+        """Uppdaterar en befintlig auktion i databasen."""
+        sql = """
+            UPDATE auctions
+            SET title = ?, description = ?, category = ?, starting_bid = ?, end_datetime = ?
+            WHERE id = ?
+        """
+        self.execute(sql, (title, description, category, starting_bid, end_datetime, auction_id))

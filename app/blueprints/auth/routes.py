@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.repositories.user_repo import UserRepo
 
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth") # Korrekt: Ingen template_folder
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -25,7 +25,7 @@ def login():
         else:
             flash("Felaktig e-postadress.", "error")
 
-    return render_template("auth/login.html")
+    return render_template("auth/login.html") # Korrekt: Pekar på app/templates/auth/login.html
 
 @auth_bp.route("/logout")
 def logout():
