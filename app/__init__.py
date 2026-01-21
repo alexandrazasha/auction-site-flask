@@ -11,13 +11,16 @@ def create_app():
         Path(app.root_path).parent / "database.db"
     )
 
-    # koppla in db-hjälpfunktioner
-    from app import db
+    # Importera och initiera databasen
+    from . import db
     db.init_app(app)
-
-    # --- BLUEPRINTS ---
-    from app.blueprints.public.routes import public_bp
+    
+    # Importera och registrera blueprints
+    from .blueprints.public.routes import public_bp
+    from .blueprints.auth.routes import auth_bp
+    from .blueprints.admin.routes import admin_bp
     app.register_blueprint(public_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
 
     return app
-
