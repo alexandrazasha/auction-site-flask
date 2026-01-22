@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+import os
 from flask import current_app, g
 
 def get_db():
@@ -18,6 +19,13 @@ def close_db(_e=None):
 
 def init_db():
     """Skapar tabeller enligt schema.sql."""
+    # Stäng befintlig connection om den finns
+    close_db()
+    # Radera den gamla databasfilen för att säkerställa en ren start
+    db_path = Path(current_app.config["DATABASE"])
+    if db_path.exists():
+        os.remove(db_path)
+
     db = get_db()
     schema_path = Path(current_app.root_path).parent / "schema.sql"
     db.executescript(schema_path.read_text(encoding="utf-8"))
