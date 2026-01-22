@@ -50,16 +50,19 @@
       <div class="auction-list">
         {% for auction in auctions %}
           <div class="auction-card">
-            <h2 class="auction-title">{{ auction.title }}</h2>
+            <h2 class="auction-title">{{ auction["title"] }}</h2>
 
-            <p class="auction-desc">{{ auction.description }}</p>
+            <p class="auction-desc">{{ auction["description"] }}</p>
 
-            <p class="auction-meta">Slutar: {{ auction.end_datetime }}</p>
             <p class="auction-meta">
-              Status: {{ "Avslutad" if auction.is_closed else "Pågående" }}
+              Slutar: {{ auction["end_datetime"] }}
             </p>
 
-            <a href="{{ url_for('auction_bp.auction_detail', auction_id=auction.id) }}" class="auction-link">
+            <p class="auction-meta">
+              Status: {{ "Avslutad" if auction["is_closed"] else "Pågående" }}
+            </p>
+
+            <a href="/auction/{{ auction["id"] }}" class="auction-link">
               Visa auktion
             </a>
           </div>
@@ -71,4 +74,5 @@
   </main>
 </body>
 </html>
+
 
