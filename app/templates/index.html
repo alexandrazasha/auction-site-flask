@@ -62,7 +62,8 @@
               Status: {{ "Avslutad" if auction["is_closed"] else "Pågående" }}
             </p>
 
-            <a href="/auction/{{ auction["id"] }}" class="auction-link">
+            <a href="/auction/{{ auction['id'] }}" class="auction-link">
+
               Visa auktion
             </a>
           </div>
