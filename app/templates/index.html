@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <title>Auktioner</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Snabb-styling för att se meddelandena tydligt */
+    .flash-messages { margin: 20px 0; }
+    .alert { padding: 15px; border-radius: 5px; margin-bottom: 10px; border: 1px solid transparent; }
+    .alert-success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+    .alert-danger { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+  </style>
 </head>
 
 <body>
@@ -19,6 +26,8 @@
   </header>
 
   <main class="container">
+    
+
     <h1 class="page-title">Pågående & kommande auktioner</h1>
 
     <div class="filter-container">
@@ -51,21 +60,12 @@
         {% for auction in auctions %}
           <div class="auction-card">
             <h2 class="auction-title">{{ auction["title"] }}</h2>
-
             <p class="auction-desc">{{ auction["description"] }}</p>
-
-            <p class="auction-meta">
-              Slutar: {{ auction["end_datetime"] }}
-            </p>
-
+            <p class="auction-meta">Slutar: {{ auction["end_datetime"] }}</p>
             <p class="auction-meta">
               Status: {{ "Avslutad" if auction["is_closed"] else "Pågående" }}
             </p>
-
-            <a href="/auction/{{ auction['id'] }}" class="auction-link">
-
-              Visa auktion
-            </a>
+            <a href="/auction/{{ auction['id'] }}" class="auction-link">Visa auktion</a>
           </div>
         {% endfor %}
       </div>
@@ -75,5 +75,3 @@
   </main>
 </body>
 </html>
-
-

@@ -49,6 +49,7 @@ def auction_detail(auction_id):
 # --- RUTT 3: LÄGGER BUD och kollar så det är högre än senaste bud ---
 @bid_bp.post("/place/<int:auction_id>")
 def place_bid(auction_id: int):
+    print("--- PLACE_BID KÖRS NU ---") # Debug-rad
     bidder_email = request.form.get("bidder_email")
 
     try:
@@ -63,12 +64,12 @@ def place_bid(auction_id: int):
     if current_top_bids:
         highest_bid = current_top_bids[0]["amount"]
         if amount <= highest_bid:
-            flash(f"Ditt bud måste vara högre än nuvarande bud ({highest_bid} kr)!")
+            flash(f"Tyvärr, någon har redan bjudit {highest_bid} kr. Du måste bjuda högre!", "danger")
             return redirect(url_for("auction_bp.auction_detail", auction_id=auction_id))
 
     # Spara bud
     BidRepository.create_bid(auction_id, bidder_email, amount)
-    flash("Ditt bud har registrerats!")
+    flash(f"Grattis! Ditt bud på {amount} kr är nu det ledande budet.", "success")
 
     # Tillbaka till din auktion-detaljsida
     return redirect(url_for("auction_bp.auction_detail", auction_id=auction_id))

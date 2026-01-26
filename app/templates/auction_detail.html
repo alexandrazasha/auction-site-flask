@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <title>{{ auction["title"] }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    /* Styling för flash-meddelanden */
+    .flash-messages { margin-bottom: 20px; }
+    .alert { padding: 15px; border-radius: 5px; border: 1px solid transparent; font-weight: bold; }
+    .alert-success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+    .alert-danger { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+  </style>
 </head>
 <body>
 
@@ -16,6 +23,18 @@
   <div class="container">
 
     <a href="/auctions" class="back-link">← Tillbaka</a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
     <h1 class="page-title">{{ auction["title"] }}</h1>
     <p class="auction-desc">{{ auction["description"] }}</p>
