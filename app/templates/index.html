@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -28,6 +29,12 @@
   <main class="container">
     
 
+=======
+{% extends "layout.html" %}
+{% block title %}Auktioner{% endblock %}
+
+{% block content %}
+>>>>>>> Karolinas
 
     <h1 class="page-title">Pågående & kommande auktioner</h1>
 
@@ -42,8 +49,9 @@
           <label for="category">Kategori</label>
           <select id="category" name="category">
             <option value="">Alla kategorier</option>
-            <option value="Konst">Konst</option>
-            <option value="Elektronik">Elektronik</option>
+            {% for category in categories %}
+              <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
           </select>
         </div>
 
@@ -80,6 +88,4 @@
     {% else %}
       <p>Det finns inga auktioner att visa.</p>
     {% endif %}
-  </main>
-</body>
-</html>
+{% endblock %}

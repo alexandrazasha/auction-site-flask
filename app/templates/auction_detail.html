@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="sv">
 <head>
@@ -13,15 +14,25 @@
   </style>
 </head>
 <body>
+=======
+{% extends "layout.html" %}
+{% block title %}{{ auction["title"] }}{% endblock %}
+>>>>>>> Karolinas
 
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/auctions" class="brand">Auktioner</a>
-    </div>
-  </header>
+{% block content %}
+  <a href="{{ url_for('public.index') }}" class="back-link">← Tillbaka till alla auktioner</a>
 
-  <div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for category, message in messages %}
+          <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
+<<<<<<< HEAD
     <a href="/auctions" class="back-link">← Tillbaka</a>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -89,7 +100,52 @@
       </section>
 
     </div>
+=======
+  <h1 class="page-title">{{ auction["title"] }}</h1>
+  <p class="auction-desc">{{ auction["description"] }}</p>
+>>>>>>> Karolinas
 
+  <div class="detail-inline">
+    <span class="pill"><strong>Startbud:</strong> {{ auction["starting_bid"] }} kr</span>
+    <span class="pill"><strong>Slutar:</strong> {{ auction["end_datetime"] }}</span>
+    <span class="pill">👍 {{ likes }} / 👎 {{ dislikes }}</span>
   </div>
-</body>
-</html>
+
+  <div class="detail-actions">
+    <form method="post" action="{{ url_for('public.like_auction', auction_id=auction.id) }}">
+      <button type="submit" class="search-btn">👍 Gilla</button>
+    </form>
+    <form method="post" action="{{ url_for('public.dislike_auction', auction_id=auction.id) }}">
+      <button type="submit" class="search-btn">👎 Ogilla</button>
+    </form>
+  </div>
+
+  <div class="detail-grid">
+
+    <section class="panel">
+      <h2 class="section-title">Budhistorik (alla bud)</h2>
+      {% if bids %}
+        <ol>
+          {% for bid in bids %}
+            <li><strong>{{ bid.amount }} kr</strong> av {{ bid.bidder_email }} - {{ bid.created_at }}</li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p class="muted">Inga bud har lagts ännu.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <h2 class="section-title">Lägg ett bud</h2>
+      <form method="post" action="{{ url_for('bid_bp.place_bid', auction_id=auction.id) }}" class="form">
+        <label for="amount">Ditt bud (SEK)</label>
+        <input type="number" id="amount" name="amount" min="{{ (bids[0].amount + 1) if bids else auction.starting_bid }}" required>
+
+        <label for="bidder_email">Din e-post</label>
+        <input type="email" id="bidder_email" name="bidder_email" required>
+
+        <button type="submit" class="search-btn">Lägg bud</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}
