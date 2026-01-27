@@ -27,6 +27,11 @@
       <input id="max_price" type="number" name="max_price" placeholder="t.ex. 500">
     </div>
 
+    <div class="filter-group">
+      <label for="end_before">Slutar före</label>
+      <input id="end_before" type="datetime-local" name="end_before">
+    </div>
+
     <button type="submit" class="search-btn">Filtrera auktioner</button>
   </form>
 </div>
@@ -55,3 +60,4 @@
   <p>Det finns inga auktioner att visa.</p>
 {% endif %}
 {% endblock %}
+

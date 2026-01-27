@@ -13,12 +13,14 @@ def search():
     sokord = request.args.get("keyword")
     kategori = request.args.get("category")
     max_pris = request.args.get("max_price")
+    end_before = request.args.get("end_before")
 
     bid_repo = BidRepository()
     resultat = bid_repo.search_auctions(
         keyword=sokord,
         category=kategori,
-        max_price=max_pris
+        max_price=max_pris,
+        end_before=end_before
     )
 
     vote_repo = VoteRepository()
@@ -31,7 +33,16 @@ def search():
             "dislikes": vote_repo.count_dislikes(a["id"]),
         })
 
-    return render_template("index.html", auctions=auctions_with_votes)
+    # Matchar era seed-kategorier (snabbt & stabilt)
+    categories = ["Accessoarer", "Sport"]
+
+    return render_template(
+        "index.html",
+        auctions=auctions_with_votes,
+        categories=categories
+    )
+
+
 
 
 # --- RUTT 2: LÄGGER BUD ---
