@@ -1,28 +1,26 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 
-# Importera dina repositories
+# Importera repositories
 from app.repositories.bid_repo import BidRepository
 from app.repositories.vote_repo import VoteRepository
 from app.repositories.auction_repo import AuctionRepository
 
-bid_bp = Blueprint('bid_bp', __name__, url_prefix='/bids')
+bid_bp = Blueprint("bid_bp", __name__, url_prefix="/bids")
 
-# --- RUTT 1: SÖKFUNKTIONN ---
-@bid_bp.route('/search')
+# --- RUTT 1: SÖKFUNKTION ---
+@bid_bp.route("/search")
 def search():
-    # Hämtar söksträng från URL-parametern 'keyword' [cite: 49]
-    sokord = request.args.get('keyword')
-    
-    # Hämtar vald kategori från formulärets rullista [cite: 51]
-    kategori = request.args.get('category')
-    
-    # Hämtar angivet maxpris för filtrering av sökresultat [cite: 52]
-    max_pris = request.args.get('max_price')
+    sokord = request.args.get("keyword")
+    kategori = request.args.get("category")
+    max_pris = request.args.get("max_price")
 
     bid_repo = BidRepository()
-    resultat = bid_repo.search_auctions(keyword=sokord, category=kategori, max_price=max_pris)
+    resultat = bid_repo.search_auctions(
+        keyword=sokord,
+        category=kategori,
+        max_price=max_pris
+    )
 
-    # Bygg samma struktur som index.html förväntar sig (auction + likes/dislikes)
     vote_repo = VoteRepository()
 
     auctions_with_votes = []
@@ -35,44 +33,42 @@ def search():
 
     return render_template("index.html", auctions=auctions_with_votes)
 
-# --- RUTT 2: LÄGGER BUD och kollar så det är högre än senaste bud ---
+
+# --- RUTT 2: LÄGGER BUD ---
 @bid_bp.post("/place/<int:auction_id>")
 def place_bid(auction_id: int):
-    print("--- PLACE_BID KÖRS NU ---") # Debug-rad
     bidder_email = request.form.get("bidder_email")
     bid_repo = BidRepository()
 
+    # Validera belopp
     try:
         amount = int(request.form.get("amount"))
     except (ValueError, TypeError):
-        flash("Ogiltigt belopp!")
+        flash("Ogiltigt belopp!", "error")
         return redirect(url_for("public.auction_detail", auction_id=auction_id))
-    
-    # Hämta auktionen för att kolla om den är stängd
+
+    # Kontrollera om auktionen är stängd
     auction_repo = AuctionRepository()
     auction = auction_repo.get_by_id(auction_id)
-    if not auction or auction['is_closed']:
+
+    if not auction or auction["is_closed"]:
         flash("Denna auktion är avslutad och tar inte emot nya bud.", "error")
         return redirect(url_for("public.auction_detail", auction_id=auction_id))
 
-
-    # Hämta nuvarande högsta bud för validering
+    # Hämta nuvarande högsta bud
     current_top_bids = bid_repo.get_top_bids(auction_id, limit=1)
 
     if current_top_bids:
         highest_bid = current_top_bids[0]["amount"]
         if amount <= highest_bid:
-<<<<<<< HEAD
-            flash(f"Tyvärr, någon har redan bjudit {highest_bid} kr. Du måste bjuda högre!", "danger")
-            return redirect(url_for("auction_bp.auction_detail", auction_id=auction_id))
-=======
-            flash("Ditt bud måste vara högre än tidigare lagda bud", "error")
+            flash(
+                f"Tyvärr, någon har redan bjudit {highest_bid} kr. Du måste bjuda högre!",
+                "error"
+            )
             return redirect(url_for("public.auction_detail", auction_id=auction_id))
->>>>>>> Karolinas
 
     # Spara bud
-    BidRepository.create_bid(auction_id, bidder_email, amount)
+    bid_repo.create_bid(auction_id, bidder_email, amount)
     flash(f"Grattis! Ditt bud på {amount} kr är nu det ledande budet.", "success")
 
-    # Tillbaka till din auktion-detaljsida
     return redirect(url_for("public.auction_detail", auction_id=auction_id))
