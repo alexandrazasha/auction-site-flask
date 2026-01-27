@@ -1,16 +1,19 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>{% if auction %}Redigera auktion{% else %}Skapa ny auktion{% endif %}</title>
-</head>
-<body>
-    <nav>
-        <a href="{{ url_for('public.index') }}">Startsida</a> |
-        <a href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a> |
-        <a href="{{ url_for('auth.logout') }}">Logga ut</a>
-    </nav>
+{% extends "layout.html" %}
+{% block title %}{% if auction %}Redigera auktion{% else %}Skapa ny auktion{% endif %}{% endblock %}
+
+{% block content %}
+
     <h1>{% if auction %}Redigera auktion{% else %}Skapa ny auktion{% endif %}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
     <form method="post">
         <p><label for="title">Titel:</label><br>
@@ -19,16 +22,29 @@
         <p><label for="description">Beskrivning:</label><br>
         <textarea id="description" name="description" required rows="5" cols="50">{{ auction.description if auction }}</textarea></p>
 
-        <p><label for="category">Kategori:</label><br>
-        <input type="text" id="category" name="category" size="50" value="{{ auction.category if auction }}"></p>
+        <p>
+            <label for="category">Kategori:</label><br>
+            <select id="category" name="category">
+                <option value="">-- Välj en kategori --</option>
+                {% set categories = ['Accessoarer', 'Elektronik', 'Konst', 'Sport'] %}
+                {% for cat in categories %}
+                    <option value="{{ cat }}" {% if auction and auction.category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </p>
 
         <p><label for="starting_bid">Startbud (SEK):</label><br>
         <input type="number" id="starting_bid" name="starting_bid" required value="{{ auction.starting_bid if auction else 0 }}"></p>
 
-        <p><label for="end_datetime">Slutdatum (YYYY-MM-DD HH:MM:SS):</label><br>
-        <input type="text" id="end_datetime" name="end_datetime" required value="{{ auction.end_datetime if auction }}" placeholder="2026-12-31 18:00:00"></p>
+        <p><label for="end_datetime">Slutdatum och tid:</label><br>
+        {#-
+           Konverterar databasformatet 'YYYY-MM-DD HH:MM:SS' till det format
+           som <input type="datetime-local"> förväntar sig: 'YYYY-MM-DDTHH:MM'.
+           Vi gör detta genom att ersätta mellanslaget med ett 'T'.
+        -#}
+        <input type="datetime-local" id="end_datetime" name="end_datetime" required
+               value="{{ auction.end_datetime.replace(' ', 'T') if auction and auction.end_datetime else '' }}"></p>
 
         <button type="submit">{% if auction %}Spara ändringar{% else %}Skapa auktion{% endif %}</button>
     </form>
-</body>
-</html>
+{% endblock %}

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Auktioner{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Auktioner{% endblock %} - Auktionssajt</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
@@ -14,7 +14,12 @@
 
       <nav class="top-nav">
         <a href="{{ url_for('public.index') }}">Startsida</a>
-        <a href="{{ url_for('auth.login') }}">Logga in</a>
+        {% if session.is_admin %}
+          <a href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+          <a href="{{ url_for('auth.logout') }}">Logga ut</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Logga in</a>
+        {% endif %}
       </nav>
     </div>
   </header>
