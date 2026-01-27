@@ -9,6 +9,7 @@ from app.repositories.bid_repo import BidRepository
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 def admin_required(f):
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get("is_admin"):
             # Om användaren inte är admin, skicka dem till inloggningssidan
