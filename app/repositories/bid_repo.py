@@ -22,6 +22,13 @@ class BidRepository(BaseRepo):
             (auction_id, limit)
         )
     
+    def get_all_bids_for_auction(self, auction_id):
+        """Hämtar alla bud för en specifik auktion, sorterade från högst till lägst och sedan efter tid."""
+        return self.query_all(
+            "SELECT * FROM bids WHERE auction_id = ? ORDER BY amount DESC, created_at DESC",
+            (auction_id,)
+        )
+
     def search_auctions(self, keyword=None, category=None, max_price=None):
         """Hämtar auktioner baserat på sökord, kategori och prisintervall."""
         # Hämtar auktioner baserat på sökord, kategori och prisintervall.

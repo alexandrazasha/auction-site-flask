@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for
 from app.repositories.auction_repo import AuctionRepository
 from app.repositories.bid_repo import BidRepository
 from app.repositories.vote_repo import VoteRepository
 
 public_bp = Blueprint('public', __name__)
+
+categories = ['Accessoarer', 'Elektronik', 'Konst', 'Sport'] # Definiera kategorilistan på modulnivå
 
 @public_bp.route('/')
 def index():
@@ -20,14 +22,38 @@ def index():
             "dislikes": vote_repo.count_dislikes(a["id"]),
         })
 
-    return render_template('index.html', auctions=auctions_with_votes)
+    return render_template('index.html', auctions=auctions_with_votes, categories=categories)
 
 @public_bp.route('/auction/<int:auction_id>')
 def auction_detail(auction_id):
     """Visar detaljsidan för en specifik auktion."""
     auction_repo = AuctionRepository()
     bid_repo = BidRepository()
-    auction = auction_repo.get_by_id(auction_id)
-    top_bids = bid_repo.get_top_bids(auction_id, limit=2)
+    vote_repo = VoteRepository() # Instansiera VoteRepository här
 
-    return render_template('detail.html', auction=auction, bids=top_bids)
+    auction = auction_repo.get_by_id(auction_id)
+    all_bids = bid_repo.get_all_bids_for_auction(auction_id) # Hämta alla bud
+    
+    # Hämta likes och dislikes för auktionen
+    likes = vote_repo.count_likes(auction_id)
+    dislikes = vote_repo.count_dislikes(auction_id)
+
+    return render_template('auction_detail.html', auction=auction, bids=all_bids, likes=likes, dislikes=dislikes)
+
+
+@public_bp.post("/auction/<int:auction_id>/like")
+def like_auction(auction_id: int):
+    """Hanterar att gilla en auktion."""
+    vote_repo = VoteRepository()
+    vote_repo.add_like(auction_id)
+    # Tillbaka till detaljsidan
+    return redirect(url_for("public.auction_detail", auction_id=auction_id))
+
+
+@public_bp.post("/auction/<int:auction_id>/dislike")
+def dislike_auction(auction_id: int):
+    """Hanterar att ogilla en auktion."""
+    vote_repo = VoteRepository()
+    vote_repo.add_dislike(auction_id)
+    # Tillbaka till detaljsidan
+    return redirect(url_for("public.auction_detail", auction_id=auction_id))

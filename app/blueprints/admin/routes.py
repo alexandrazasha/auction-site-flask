@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 from functools import wraps
 from app.repositories.auction_repo import AuctionRepository
 import datetime # Importera datetime för eventuell framtida datumvalidering
+from app.blueprints.public.routes import categories as all_categories # Importera kategorilistan
 from app.repositories.bid_repo import BidRepository
 # Skapar en Blueprint för admin-sidorna. Alla routes här kommer att börja med /admin
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -75,7 +76,7 @@ def create_auction():
             flash(f"Ett fel uppstod vid skapandet av auktionen: {e}", "error")
 
 
-    return render_template("admin/auction_form.html", auction=None) # För GET-request, visa ett tomt formulär
+    return render_template("admin/auction_form.html", auction=None, categories=all_categories) # För GET-request, visa ett tomt formulär
 
 @admin_bp.route("/auction/<int:auction_id>/edit", methods=["GET", "POST"])
 @admin_required
@@ -122,8 +123,8 @@ def edit_auction(auction_id):
             flash(f"Ett fel uppstod vid uppdatering av auktionen: {e}", "error")
             return render_template("admin/auction_form.html", auction=auction_to_edit)
 
-    # För GET-request, visa formuläret med förifylld data.
-    return render_template("admin/auction_form.html", auction=auction_to_edit)
+    # För GET-request, visa formuläret med förifylld data och kategorier.
+    return render_template("admin/auction_form.html", auction=auction_to_edit, categories=all_categories)
 
 @admin_bp.route("/auction/<int:auction_id>/delete", methods=["POST"])
 @admin_required

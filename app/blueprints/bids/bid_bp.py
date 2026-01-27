@@ -5,7 +5,7 @@ from app.repositories.bid_repo import BidRepository
 from app.repositories.vote_repo import VoteRepository
 from app.repositories.auction_repo import AuctionRepository
 
-bid_bp = Blueprint('bid_bp', __name__)
+bid_bp = Blueprint('bid_bp', __name__, url_prefix='/bids')
 
 # --- RUTT 1: SÖKFUNKTIONN ---
 @bid_bp.route('/search')
@@ -61,7 +61,7 @@ def place_bid(auction_id: int):
     if current_top_bids:
         highest_bid = current_top_bids[0]["amount"]
         if amount <= highest_bid:
-            flash(f"Ditt bud måste vara högre än nuvarande bud ({highest_bid} kr)!")
+            flash("Ditt bud måste vara högre än tidigare lagda bud", "error")
             return redirect(url_for("public.auction_detail", auction_id=auction_id))
 
     # Spara bud
