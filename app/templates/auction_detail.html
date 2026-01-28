@@ -1,10 +1,12 @@
+{#- Denna mall ärver grundstrukturen (header, footer, etc.) från layout.html -#}
 {% extends "layout.html" %}
 
+{#- Sätter sidans titel i webbläsarens flik till auktionens titel -#}
 {% block title %}{{ auction["title"] }}{% endblock %}
 
 {% block content %}
 <a href="{{ url_for('public.index') }}" class="back-link">← Tillbaka till alla auktioner</a>
-
+{#- Block som visar "flash"-meddelanden, typ "Ditt bud har lagts!" -#}
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div class="flash-messages">
@@ -17,11 +19,13 @@
   {% endif %}
 {% endwith %}
 
+{#- Huvudrubrik och beskrivning för auktionen -#}
 <h1 class="page-title">{{ auction["title"] }}</h1>
 <p class="auction-desc">{{ auction["description"] }}</p>
 
+{#- Rad med nyckelinformation -#}
 <div class="detail-inline">
-  <span class="pill"><strong>Startbud:</strong> {{ auction["starting_bid"] }} kr</span>
+  <span class="pill"><strong>Startbud:</strong> {{ auction["starting_bid"] }} kr</span> {#- 'kr' är hårdkodat här -#}
   <span class="pill"><strong>Slutar:</strong> {{ auction["end_datetime"] }}</span>
   <span class="pill">👍 {{ likes }} / 👎 {{ dislikes }}</span>
 </div>
@@ -35,10 +39,13 @@
   </form>
 </div>
 
+{#- En grid som delar upp sidan i två kolumner: budhistorik och formulär för att lägga bud -#}
 <div class="detail-grid">
 
+  {#- VÄNSTRA kolumnen: Budhistorik -#}
   <section class="panel">
     <h2 class="section-title">Budhistorik</h2>
+    {#- Om det finns några bud i 'bids'-listan, visa dem -#}
     {% if bids %}
       <ol class="bid-list">
         {% for bid in bids %}
@@ -49,19 +56,27 @@
           </li>
         {% endfor %}
       </ol>
+    {#- Om 'bids'-listan är tom, visa ett meddelande istället -#}
     {% else %}
       <p class="muted">Inga bud har lagts ännu.</p>
     {% endif %}
   </section>
 
+  {#- HÖGRA kolumnen: Formulär för att lägga ett nytt bud -#}
   <section class="panel">
     <h2 class="section-title">Lägg ett bud</h2>
+    {#- Formuläret skickar datan till 'place_bid'-funktionen i 'bid_bp' (bids/bid_bp.py) -#}
     <form method="post" action="{{ url_for('bid_bp.place_bid', auction_id=auction.id) }}" class="form">
       <label for="amount">Ditt bud (SEK)</label>
       <input
         type="number"
         id="amount"
         name="amount"
+        {#-
+           Sätter ett dynamiskt minimivärde.
+           Om det finns bud ('bids' är inte tom), måste det nya budet vara minst 1 kr högre än det nuvarande högsta budet.
+           Annars måste budet vara minst lika högt som startbudet.
+        -#}
         min="{{ (bids[0].amount + 1) if bids else auction.starting_bid }}"
         required
       >

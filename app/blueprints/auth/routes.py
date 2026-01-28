@@ -16,7 +16,7 @@ def login():
         # Försök hitta en användare i databasen med den e-postadressen
         user = user_repo.get_by_email(email)
 
-        # Om en användare hittades...
+        # Om en användare hittades:
         if user:
             # Rensa eventuell gammal sessionsdata
             session.clear()

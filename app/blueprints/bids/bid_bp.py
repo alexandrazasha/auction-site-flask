@@ -7,7 +7,7 @@ from app.repositories.auction_repo import AuctionRepository
 
 bid_bp = Blueprint("bid_bp", __name__, url_prefix="/bids")
 
-# --- RUTT 1: SÖKFUNKTION ---
+# SÖKFUNKTION
 @bid_bp.route("/search")
 def search():
     sokord = request.args.get("keyword")
@@ -33,7 +33,7 @@ def search():
             "dislikes": vote_repo.count_dislikes(a["id"]),
         })
 
-    # Matchar era seed-kategorier (snabbt & stabilt)
+    # Matcha våra kategorier
     categories = ["Accessoarer", "Sport"]
 
     return render_template(
@@ -45,13 +45,13 @@ def search():
 
 
 
-# --- RUTT 2: LÄGGER BUD ---
+# LÄGGA BUD 
 @bid_bp.post("/place/<int:auction_id>")
 def place_bid(auction_id: int):
     bidder_email = request.form.get("bidder_email")
     bid_repo = BidRepository()
 
-    # Validera belopp
+    # Validera beloppet
     try:
         amount = int(request.form.get("amount"))
     except (ValueError, TypeError):
@@ -78,7 +78,7 @@ def place_bid(auction_id: int):
             )
             return redirect(url_for("public.auction_detail", auction_id=auction_id))
 
-    # Spara bud
+    # Spara budet
     bid_repo.create_bid(auction_id, bidder_email, amount)
     flash(f"Grattis! Ditt bud på {amount} kr är nu det ledande budet.", "success")
 
