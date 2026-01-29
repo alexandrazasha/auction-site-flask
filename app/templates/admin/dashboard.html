@@ -29,6 +29,7 @@
                     <th>Titel</th>
                     <th>Beskrivning</th>
                     <th>Slutdatum</th>
+                    <th>Antal bud</th>
                     <th>Status</th>
                     <th>Åtgärder</th>
                 </tr>
@@ -41,6 +42,7 @@
                         <td>{{ auction.title }}</td>
                         <td>{{ auction.description }}</td>
                         <td>{{ auction.end_datetime }}</td>
+                        <td>{{ auction.bid_count }}</td>
                         <td>{{ "Avslutad" if auction.is_closed else "Pågående" }}</td>
                         <td class="action-group">
                             <a href="{{ url_for('admin.edit_auction', auction_id=auction.id) }}" class="auction-link admin-action-btn">Redigera</a>

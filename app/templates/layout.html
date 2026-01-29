@@ -25,10 +25,12 @@
   </header>
 
   <main class="container">
+    {#- Detta block hämtar och visar alla "flash"-meddelanden från sessionen -#}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="flash-messages">
           {% for category, message in messages %}
+            {#- Skapar en div med klasser som t.ex. "alert alert-success" eller "alert alert-error" -#}
             <div class="alert alert-{{ category }}">
               {{ message }}
             </div>
@@ -36,8 +38,7 @@
         </div>
       {% endif %}
     {% endwith %}
-
-    {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
   </main>
 </body>
 </html>
