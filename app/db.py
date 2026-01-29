@@ -19,7 +19,7 @@ def close_db(_e=None):
 
 def init_db():
     # Skapar tabeller enligt schema.sql.
-    # Stäng befintlig connection om den finns
+    # Stänger befintlig connection om den finns
     close_db()
     # Radera den gamla databasfilen för att säkerställa en ren start
     db_path = Path(current_app.config["DATABASE"])

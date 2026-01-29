@@ -8,7 +8,7 @@
         <p>Här hanterar du auktioner och bud.</p>
         <p><a href="{{ url_for('admin.create_auction') }}" class="auction-link">Skapa ny auktion</a></p>
     </div>
-    <!-- Denna del visar "flash-meddelanden" (t.ex. "Auktionen har skapats!") -->
+    <!-- flash-meddelanden -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">
@@ -34,18 +34,17 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Loopa igenom varje auktion som skickades från Python-koden -->
+                <!-- Loopar igenom varje auktion som skickades från Python-koden -->
                 {% for auction in auctions %}
                     <tr>
                         <td>{{ auction.id }}</td>
                         <td>{{ auction.title }}</td>
                         <td>{{ auction.description }}</td>
                         <td>{{ auction.end_datetime }}</td>
-                        <!-- Enkel if-sats i Jinja2: Om is_closed är sant, skriv "Avslutad", annars "Pågående" -->
                         <td>{{ "Avslutad" if auction.is_closed else "Pågående" }}</td>
                         <td class="action-group">
                             <a href="{{ url_for('admin.edit_auction', auction_id=auction.id) }}" class="auction-link admin-action-btn">Redigera</a>
-                            <!-- Formulär för att ta bort. onsubmit kör lite javascript för att visa en bekräftelseruta. -->
+                            <!-- Formulär för att ta bort. -->
                             <form method="post" action="{{ url_for('admin.delete_auction', auction_id=auction.id) }}" onsubmit="return confirm('Är du säker på att du vill ta bort denna auktion?');">
                                 <button type="submit" class="btn admin-action-btn">Ta bort</button>
                             </form>

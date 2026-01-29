@@ -1,5 +1,5 @@
-# Denna fil innehåller alla routes för admin-panelen.
-# Härifrån kan admin se alla auktioner, skapa nya, redigera, och ta bort dem.
+# Denna fil innehåller alla routes för admin-panelen!
+# Härifrån kan admin se alla auktioner, skapa nya, redigera, och ta bort.
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from functools import wraps
 from app.repositories.auction_repo import AuctionRepository
@@ -13,7 +13,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get("is_admin"):
-            # Om användaren inte är admin, skicka dem till inloggningssidan
+            # Om användaren inte är admin, skicka till inloggningssidan
             flash("Du måste vara administratör för att se denna sida.", "error")
             return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
@@ -31,7 +31,7 @@ def dashboard():
 @admin_bp.route("/auction/new", methods=["GET", "POST"])
 @admin_required
 def create_auction():
-    """Hanterar skapandet av en ny auktion."""
+    """Hanterar skapandet av en NY auktion."""
     # Om förfrågan är en POST, betyder det att formuläret har skickats in
     if request.method == "POST":
         # Hämta data från formuläret. .strip() tar bort onödiga mellanslag.
@@ -46,13 +46,13 @@ def create_auction():
             try:
                 # Konvertera från "YYYY-MM-DDTHH:MM" till ett datetime-objekt
                 dt_object = datetime.datetime.fromisoformat(end_datetime_from_form)
-                # Formatera om objektet till den sträng databasen förväntar sig: "YYYY-MM-DD HH:MM:SS"
+                # Formatera om objektet till den sträng databasen förväntar sig, alltså: "YYYY-MM-DD HH:MM:SS"
                 end_datetime_for_db = dt_object.strftime('%Y-%m-%d %H:%M:%S')
             except ValueError:
                 flash("Ogiltigt datumformat.", "error")
                 return render_template("admin/auction_form.html", auction=None)
 
-        # Enkel validering för att se till att viktiga fält inte är tomma
+        # Enkel validering för att se till att fälten inte är tomma
         if not title or not description or not end_datetime_for_db:
             flash("Titel, beskrivning och slutdatum är obligatoriska.", "error")
             # Skicka tillbaka användaren till formuläret om något saknas
@@ -81,7 +81,7 @@ def create_auction():
 @admin_bp.route("/auction/<int:auction_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_auction(auction_id):
-    """Hanterar redigering av en befintlig auktion."""
+    """Hanterar redigering av en BEFINTLIG auktion."""
     auction_repo = AuctionRepository()
     auction_to_edit = auction_repo.get_by_id(auction_id)
     

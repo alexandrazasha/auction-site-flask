@@ -7,18 +7,20 @@ from app.repositories.auction_repo import AuctionRepository
 
 bid_bp = Blueprint("bid_bp", __name__, url_prefix="/bids")
 
-# --- RUTT 1: SÖKFUNKTION ---
+# SÖKFUNKTION
 @bid_bp.route("/search")
 def search():
     sokord = request.args.get("keyword")
     kategori = request.args.get("category")
     max_pris = request.args.get("max_price")
+    end_before = request.args.get("end_before")
 
     bid_repo = BidRepository()
     resultat = bid_repo.search_auctions(
         keyword=sokord,
         category=kategori,
-        max_price=max_pris
+        max_price=max_pris,
+        end_before=end_before
     )
 
     vote_repo = VoteRepository()
@@ -31,16 +33,25 @@ def search():
             "dislikes": vote_repo.count_dislikes(a["id"]),
         })
 
-    return render_template("index.html", auctions=auctions_with_votes)
+    # Matcha våra kategorier
+    categories = ["Accessoarer", "Sport"]
+
+    return render_template(
+        "index.html",
+        auctions=auctions_with_votes,
+        categories=categories
+    )
 
 
-# --- RUTT 2: LÄGGER BUD ---
+
+
+# LÄGGA BUD 
 @bid_bp.post("/place/<int:auction_id>")
 def place_bid(auction_id: int):
     bidder_email = request.form.get("bidder_email")
     bid_repo = BidRepository()
 
-    # Validera belopp
+    # Validera beloppet
     try:
         amount = int(request.form.get("amount"))
     except (ValueError, TypeError):
@@ -67,7 +78,7 @@ def place_bid(auction_id: int):
             )
             return redirect(url_for("public.auction_detail", auction_id=auction_id))
 
-    # Spara bud
+    # Spara budet
     bid_repo.create_bid(auction_id, bidder_email, amount)
     flash(f"Grattis! Ditt bud på {amount} kr är nu det ledande budet.", "success")
 

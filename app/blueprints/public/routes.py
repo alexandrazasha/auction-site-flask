@@ -1,3 +1,4 @@
+#Denna fil hanterar "framsidan" av appen. Hämtar auktionerna, räknar likes/dislikes
 from flask import Blueprint, render_template, redirect, url_for
 from app.repositories.auction_repo import AuctionRepository
 from app.repositories.bid_repo import BidRepository
@@ -29,10 +30,10 @@ def auction_detail(auction_id):
     """Visar detaljsidan för en specifik auktion."""
     auction_repo = AuctionRepository()
     bid_repo = BidRepository()
-    vote_repo = VoteRepository() # Instansiera VoteRepository här
+    vote_repo = VoteRepository()
 
     auction = auction_repo.get_by_id(auction_id)
-    all_bids = bid_repo.get_all_bids_for_auction(auction_id) # Hämta alla bud
+    all_bids = bid_repo.get_all_bids_for_auction(auction_id)
     
     # Hämta likes och dislikes för auktionen
     likes = vote_repo.count_likes(auction_id)
@@ -43,7 +44,7 @@ def auction_detail(auction_id):
 
 @public_bp.post("/auction/<int:auction_id>/like")
 def like_auction(auction_id: int):
-    """Hanterar att gilla en auktion."""
+    """Hanterar att LIKEA en auktion."""
     vote_repo = VoteRepository()
     vote_repo.add_like(auction_id)
     # Tillbaka till detaljsidan
@@ -52,7 +53,7 @@ def like_auction(auction_id: int):
 
 @public_bp.post("/auction/<int:auction_id>/dislike")
 def dislike_auction(auction_id: int):
-    """Hanterar att ogilla en auktion."""
+    """Hanterar att DISLIKEA en auktion."""
     vote_repo = VoteRepository()
     vote_repo.add_dislike(auction_id)
     # Tillbaka till detaljsidan
