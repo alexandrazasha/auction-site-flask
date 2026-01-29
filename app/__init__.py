@@ -34,5 +34,4 @@ def create_app(test_config=None):
     app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(bid_bp)
-
     return app
