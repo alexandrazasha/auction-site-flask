@@ -80,6 +80,6 @@ def place_bid(auction_id: int):
 
     # Spara budet
     bid_repo.create_bid(auction_id, bidder_email, amount)
-    flash(f"Grattis! Ditt bud på {amount} kr är nu det ledande budet.", "success")
+    flash("Tack! Ditt bud är registrerat.", "success")
 
     return redirect(url_for("public.auction_detail", auction_id=auction_id))

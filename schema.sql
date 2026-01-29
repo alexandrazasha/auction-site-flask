@@ -47,7 +47,7 @@ VALUES
 ('Vintage klocka', 'Fin klocka i bra skick.', 'Accessoarer', 100, datetime('now', '+2 days')),
 ('Skidor', 'Skidor för alpint, längd 170.', 'Sport', 500, datetime('now', '+5 days'));
 
-INSERT INTO users (email, role)
+INSERT INTO users (email, password_hash, role)
 VALUES
-('admin@example.com', 'admin'),
-('user@example.com', 'user');
+('admin@example.com', 'dummy_password', 'admin'),
+('user@example.com', 'dummy_password', 'user');

@@ -43,6 +43,12 @@
             <strong>{{ bid.amount }} kr</strong>
             – {{ bid.bidder_email }}
             – {{ bid.created_at }}
+            {#- Denna knapp visas BARA om en admin är inloggad -#}
+            {% if session.is_admin %}
+              <form action="{{ url_for('admin.delete_bid', bid_id=bid.id) }}" method="post" style="display: inline; margin-left: 1rem;">
+                  <button type="submit" class="btn-danger" onclick="return confirm('Är du säker på att du vill ta bort detta bud?');">Ta bort</button>
+              </form>
+            {% endif %}
           </li>
         {% endfor %}
       </ol>

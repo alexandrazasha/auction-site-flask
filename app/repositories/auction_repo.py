@@ -14,6 +14,19 @@ class AuctionRepository(BaseRepo):
         """
         return self.query_all(sql)
 
+    def get_all_with_bid_count(self):
+        """
+        Hämtar alla auktioner från databasen och inkluderar antalet bud för varje auktion.
+        """
+        sql = """
+        SELECT a.*, COUNT(b.id) as bid_count
+        FROM auctions a
+        LEFT JOIN bids b ON a.id = b.auction_id
+        GROUP BY a.id
+        ORDER BY a.end_datetime ASC
+        """
+        return self.query_all(sql)
+
     def get_by_id(self, auction_id: int):
         """Hämtar en specifik auktion baserat på dess ID."""
         sql = """

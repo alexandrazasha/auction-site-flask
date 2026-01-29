@@ -25,7 +25,7 @@ def dashboard():
     """Visar admin-panelens startsida med en lista över alla auktioner."""
     # Hämta alla auktioner från databasen via vårt repository
     auction_repo = AuctionRepository()
-    all_auctions = auction_repo.get_all()
+    all_auctions = auction_repo.get_all_with_bid_count()
     return render_template("admin/dashboard.html", auctions=all_auctions)
 
 @admin_bp.route("/auction/new", methods=["GET", "POST"])
