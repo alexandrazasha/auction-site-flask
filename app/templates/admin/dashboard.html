@@ -1,48 +1,64 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-</head>
-<body>
-    <nav>
-        <a href="{{ url_for('public.index') }}">Startsida</a> |
-        <a href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a> |
-        <a href="{{ url_for('auth.logout') }}">Logga ut</a>
-    </nav>
-    <h1>Välkommen till Admin-panelen!</h1>
-    <p>Här kommer du kunna hantera auktioner och bud.</p>
+{% extends "layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
 
-    <p><a href="{{ url_for('admin.create_auction') }}">Skapa ny auktion</a></p>
+{% block content %}
+
+    <div class="admin-header">
+        <h1>Välkommen till Admin-panelen!</h1>
+        <p>Här hanterar du auktioner och bud.</p>
+        <p><a href="{{ url_for('admin.create_auction') }}" class="auction-link">Skapa ny auktion</a></p>
+    </div>
+    <!-- flash-meddelanden -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
     <h2>Alla Auktioner</h2>
+    <!-- Om det finns några auktioner i databasen, visa tabellen -->
     {% if auctions %}
         <table border="1" style="width:100%; border-collapse: collapse;">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Titel</th>
+                    <th>Beskrivning</th>
                     <th>Slutdatum</th>
                     <th>Status</th>
                     <th>Åtgärder</th>
                 </tr>
             </thead>
             <tbody>
+                <!-- Loopar igenom varje auktion som skickades från Python-koden -->
                 {% for auction in auctions %}
                     <tr>
                         <td>{{ auction.id }}</td>
                         <td>{{ auction.title }}</td>
+                        <td>{{ auction.description }}</td>
                         <td>{{ auction.end_datetime }}</td>
                         <td>{{ "Avslutad" if auction.is_closed else "Pågående" }}</td>
-                        <td>
-                            <a href="{{ url_for('admin.edit_auction', auction_id=auction.id) }}">Redigera</a>
+                        <td class="action-group">
+                            <a href="{{ url_for('admin.edit_auction', auction_id=auction.id) }}" class="auction-link admin-action-btn">Redigera</a>
+                            <!-- Formulär för att ta bort. -->
+                            <form method="post" action="{{ url_for('admin.delete_auction', auction_id=auction.id) }}" onsubmit="return confirm('Är du säker på att du vill ta bort denna auktion?');">
+                                <button type="submit" class="btn admin-action-btn">Ta bort</button>
+                            </form>
+                            <!-- Formulär för att stänga. Knappen är inaktiverad (disabled) om auktionen redan är stängd. -->
+                            <form method="post" action="{{ url_for('admin.close_auction', auction_id=auction.id) }}" onsubmit="return confirm('Vill du stänga auktionen för nya bud?');">
+                                <button type="submit" class="btn admin-action-btn" {% if auction.is_closed %}disabled{% endif %}>Stäng</button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+    <!-- Om det inte finns några auktioner, visa ett meddelande istället för en tom tabell -->
     {% else %}
         <p>Det finns inga auktioner att visa.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}

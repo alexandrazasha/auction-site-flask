@@ -1,97 +1,92 @@
-<!doctype html>
-<html lang="sv">
-<head>
-  <meta charset="utf-8">
-  <title>{{ auction["title"] }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <style>
-    /* Styling för flash-meddelanden */
-    .flash-messages { margin-bottom: 20px; }
-    .alert { padding: 15px; border-radius: 5px; border: 1px solid transparent; font-weight: bold; }
-    .alert-success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
-    .alert-danger { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
-  </style>
-</head>
-<body>
+{#- Denna mall ärver grundstrukturen (header, footer, etc.) från layout.html -#}
+{% extends "layout.html" %}
 
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/auctions" class="brand">Auktioner</a>
-    </div>
-  </header>
+{#- Sätter sidans titel i webbläsarens flik till auktionens titel -#}
+{% block title %}{{ auction["title"] }}{% endblock %}
 
-  <div class="container">
-
-    <a href="/auctions" class="back-link">← Tillbaka</a>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-              {{ message }}
-            </div>
-          {% endfor %}
+{% block content %}
+<a href="{{ url_for('public.index') }}" class="back-link">← Tillbaka till alla auktioner</a>
+{#- Block som visar "flash"-meddelanden, typ "Ditt bud har lagts!" -#}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
         </div>
-      {% endif %}
-    {% endwith %}
-
-    <h1 class="page-title">{{ auction["title"] }}</h1>
-    <p class="auction-desc">{{ auction["description"] }}</p>
-
-    <div class="detail-inline">
-      <span class="pill"><strong>Startbud:</strong> {{ auction["starting_bid"] }}</span>
-      <span class="pill"><strong>Slutar:</strong> {{ auction["end_datetime"] }}</span>
-      <span class="pill">👍 {{ likes }} / 👎 {{ dislikes }}</span>
+      {% endfor %}
     </div>
+  {% endif %}
+{% endwith %}
 
-    <div class="detail-actions">
-      <form method="post" action="/auction/{{ auction['id'] }}/like">
-        <button type="submit" class="search-btn">👍 Like</button>
-      </form>
-      <form method="post" action="/auction/{{ auction['id'] }}/dislike">
-        <button type="submit" class="search-btn">👎 Dislike</button>
-      </form>
-    </div>
+{#- Huvudrubrik och beskrivning för auktionen -#}
+<h1 class="page-title">{{ auction["title"] }}</h1>
+<p class="auction-desc">{{ auction["description"] }}</p>
 
-    <div class="detail-grid">
+{#- Rad med nyckelinformation -#}
+<div class="detail-inline">
+  <span class="pill"><strong>Startbud:</strong> {{ auction["starting_bid"] }} kr</span> {#- 'kr' är hårdkodat här -#}
+  <span class="pill"><strong>Slutar:</strong> {{ auction["end_datetime"] }}</span>
+  <span class="pill">👍 {{ likes }} / 👎 {{ dislikes }}</span>
+</div>
 
-      <section class="panel">
-        <h2 class="section-title">Två högsta bud</h2>
+<div class="detail-actions">
+  <form method="post" action="{{ url_for('public.like_auction', auction_id=auction.id) }}">
+    <button type="submit" class="search-btn">👍 Gilla</button>
+  </form>
+  <form method="post" action="{{ url_for('public.dislike_auction', auction_id=auction.id) }}">
+    <button type="submit" class="search-btn">👎 Ogilla</button>
+  </form>
+</div>
 
-        {% if top_bids %}
-          <ol class="bid-list">
-            {% for bid in top_bids %}
-              <li class="bid-item">
-                <strong>{{ bid["amount"] }}</strong> kr
-                – {{ bid["bidder_email"] }}
-                – {{ bid["created_at"] }}
-              </li>
-            {% endfor %}
-          </ol>
-        {% else %}
-          <p class="muted">Inga bud ännu.</p>
-        {% endif %}
-      </section>
+{#- En grid som delar upp sidan i två kolumner: budhistorik och formulär för att lägga bud -#}
+<div class="detail-grid">
 
-      <section class="panel">
-        <h2 class="section-title">Lägg bud</h2>
+  {#- VÄNSTRA kolumnen: Budhistorik -#}
+  <section class="panel">
+    <h2 class="section-title">Budhistorik</h2>
+    {#- Om det finns några bud i 'bids'-listan, visa dem -#}
+    {% if bids %}
+      <ol class="bid-list">
+        {% for bid in bids %}
+          <li class="bid-item">
+            <strong>{{ bid.amount }} kr</strong>
+            – {{ bid.bidder_email }}
+            – {{ bid.created_at }}
+          </li>
+        {% endfor %}
+      </ol>
+    {#- Om 'bids'-listan är tom, visa ett meddelande istället -#}
+    {% else %}
+      <p class="muted">Inga bud har lagts ännu.</p>
+    {% endif %}
+  </section>
 
-        <form method="post" action="/bids/place/{{ auction['id'] }}" class="form">
-          <label for="amount">Belopp</label>
-          <input type="number" id="amount" name="amount" min="1" required>
+  {#- HÖGRA kolumnen: Formulär för att lägga ett nytt bud -#}
+  <section class="panel">
+    <h2 class="section-title">Lägg ett bud</h2>
+    {#- Formuläret skickar datan till 'place_bid'-funktionen i 'bid_bp' (bids/bid_bp.py) -#}
+    <form method="post" action="{{ url_for('bid_bp.place_bid', auction_id=auction.id) }}" class="form">
+      <label for="amount">Ditt bud (SEK)</label>
+      <input
+        type="number"
+        id="amount"
+        name="amount"
+        {#-
+           Sätter ett dynamiskt minimivärde.
+           Om det finns bud ('bids' är inte tom), måste det nya budet vara minst 1 kr högre än det nuvarande högsta budet.
+           Annars måste budet vara minst lika högt som startbudet.
+        -#}
+        min="{{ (bids[0].amount + 1) if bids else auction.starting_bid }}"
+        required
+      >
 
-          <label for="bidder_email">E-post</label>
-          <input type="email" id="bidder_email" name="bidder_email" required>
+      <label for="bidder_email">Din e-post</label>
+      <input type="email" id="bidder_email" name="bidder_email" required>
 
-          <button type="submit" class="search-btn">Lägg bud</button>
-        </form>
-      </section>
+      <button type="submit" class="search-btn">Lägg bud</button>
+    </form>
+  </section>
 
-    </div>
-
-  </div>
-</body>
-</html>
-
-
+</div>
+{% endblock %}

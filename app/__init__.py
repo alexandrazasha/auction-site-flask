@@ -1,28 +1,38 @@
+import os
 from flask import Flask
-from pathlib import Path
 
+def create_app(test_config=None):
+# Den här funktionen startar upp hela Flask-appen (alltså Application Factory).
+    # Vi använder instance_relative_config för att databasen ska ligga i 
+    # 'instance'-mappen, vilket är säkrare och håller ordning i projektet.
+    app = Flask(__name__, instance_relative_config=True)
 
-def create_app():
-    app = Flask(__name__)
-    app.config["SECRET_KEY"] = "dev"
+    app.config.from_mapping(
+        # En hemlig nyckel för att hålla sessioner säkra!
+        SECRET_KEY='dev',
+        # Sökvägen till SQLite-databasfilen.
+        DATABASE=os.path.join(app.instance_path, 'database.db'),
+    )
 
-    app.config["DATABASE"] = str(Path(app.root_path).parent / "database.db")
+    # Ser till att 'instance'-mappen existerar
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
-    # Importera och initiera databasen
+    # Initiera databasfunktioner med appen
     from . import db
     db.init_app(app)
-    
-    # Importera och registrera blueprints
+
+    # Importerar och registrera blueprints
     from .blueprints.public.routes import public_bp
-    from .blueprints.auth.routes import auth_bp # Din blueprint
-    from .blueprints.admin.routes import admin_bp # Din blueprint
-    from .blueprints.auction.routes import auction_bp # Från main
-    from .blueprints.bids.bid_bp import bid_bp # Från main
+    from .blueprints.admin.routes import admin_bp
+    from .blueprints.auth.routes import auth_bp
+    from .blueprints.bids.bid_bp import bid_bp
 
     app.register_blueprint(public_bp)
-    app.register_blueprint(auction_bp)
-    app.register_blueprint(bid_bp, url_prefix="/bids")
-    app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(bid_bp)
 
     return app

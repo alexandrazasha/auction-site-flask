@@ -1,8 +1,12 @@
+# Denna fil är ett "Repository" för auktioner.
+# Innehåller alla funktioner för att hämta, skapa, uppdatera och ta bort
+# auktioner från databasen.
 from app.repositories.base_repo import BaseRepo
 
 
 class AuctionRepository(BaseRepo):
     def get_all(self):
+        """Hämtar alla auktioner från databasen, sorterade efter slutdatum."""
         sql = """
         SELECT *
         FROM auctions
@@ -11,6 +15,7 @@ class AuctionRepository(BaseRepo):
         return self.query_all(sql)
 
     def get_by_id(self, auction_id: int):
+        """Hämtar en specifik auktion baserat på dess ID."""
         sql = """
         SELECT *
         FROM auctions
@@ -19,6 +24,7 @@ class AuctionRepository(BaseRepo):
         return self.query_one(sql, (auction_id,))
 
     def get_top_two_bids(self, auction_id: int):
+        """Hämtar de två högsta buden för en specifik auktion."""
         sql = """
         SELECT bidder_email, amount, created_at
         FROM bids
@@ -44,3 +50,15 @@ class AuctionRepository(BaseRepo):
             WHERE id = ?
         """
         self.execute(sql, (title, description, category, starting_bid, end_datetime, auction_id))
+
+    def delete(self, auction_id: int):
+        """Tar bort en auktion från databasen."""
+        # Denna SQL-fråga tar bort en rad från 'auctions'-tabellen.
+        # Om databasen är inställd med "ON DELETE CASCADE" för bud och röster,
+        # kommer de också att tas bort automatiskt.
+        self.execute("DELETE FROM auctions WHERE id = ?", (auction_id,))
+
+    def mark_as_closed(self, auction_id: int):
+        """Markerar en auktion som avslutad (is_closed = 1)."""
+        sql = "UPDATE auctions SET is_closed = 1 WHERE id = ?"
+        self.execute(sql, (auction_id,))
